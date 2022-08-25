@@ -41,7 +41,7 @@ macOS notes:
 
 Linux notes:
 
-* ```gcc``` and ```make`` is all you need. On Ubuntu install build-essential via ```apt```
+* ```gcc``` and ```make``` is all you need to build libdither. E.g. on Ubuntu you should install build-essential via ```apt``` to get these tools.
 
 Windows notes:
 
