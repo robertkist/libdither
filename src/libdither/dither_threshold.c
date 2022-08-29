@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "libdither.h"
 #include "random.h"
-#include "gamma.h"
 
 MODULE_API double auto_threshold(const DitherImage* img) {
     /* automatically determines the best threshold value for the image.

@@ -7,10 +7,14 @@ extern "C"{
 #endif
 
 #ifdef _WIN32
-#  ifdef MODULE_API_EXPORTS
-#    define MODULE_API __declspec(dllexport)
+#  ifndef __MINGW32__
+#    ifdef MODULE_API_EXPORTS
+#      define MODULE_API __declspec(dllexport)
+#    else
+#      define MODULE_API __declspec(dllimport)
+#    endif
 #  else
-#    define MODULE_API __declspec(dllimport)
+#    define MODULE_API
 #  endif
 #else
 #  define MODULE_API
@@ -19,10 +23,13 @@ extern "C"{
 #include <stdbool.h>
 #include <stdint.h>
 #include "matrices.h"
-#include "gamma.h"
 
 /* returns the version number of this library */
 MODULE_API const char* libdither_version();
+/* sRGB to linear color space conversion */
+MODULE_API double gamma_decode(double c);
+/* linear color to sRGB space conversion */
+MODULE_API double gamma_encode(double c);
 
 /* ************************************************* */
 /* **** DITHERIMAGE - INPUT IMAGE FOR DITHERERS **** */

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "libdither.h"
-#include "gamma.h"
 
 /*
  * DitherImage is a greyscale buffer in linear color space.
