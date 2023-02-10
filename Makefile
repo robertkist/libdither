@@ -31,7 +31,7 @@ define fn_mkdir
 	@mkdir -p "$(1)"
 endef
 	CP=cp
-	DELTREE=rm -R
+	DELTREE=rm -Rf
 	SEP=/
 	ifeq ($(shell uname), Darwin)  # macOS
 		CC=clang
