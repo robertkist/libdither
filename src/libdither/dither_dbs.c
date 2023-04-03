@@ -110,7 +110,7 @@ MODULE_API void dbs_dither(const DitherImage* img, int v, uint8_t* out) {
     const int half_cpp_size = 6;
     get_cep(img,img->width, img->height, v, &cpp, &cep);
     int8_t* dst = (int8_t*)calloc(img->width * img->height, sizeof(int8_t));
-    for(int iter_count=0; ; iter_count++) {
+    while(1) {
         int count_b = 0;
         for(int i = 0; i < img->height; i++) {
             for(int j = 0; j < img->width; j++) {
