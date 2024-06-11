@@ -49,19 +49,19 @@ Bmp* bmp_load(char* filename) {
         fprintf(stderr, "ERROR: wrong format. BMP must be uncompressed\n");
         return NULL;
     }
-    if (*(uint32_t*)(header + 10) != 54) {
-        free(header);
-        fprintf(stderr, "ERROR: wrong BMP format.\n"); // might have extra information after header, before image data
-        return NULL;
-    }
+    uint32_t pixel_start_pos = *(header + 10) |   // BMP header is little-endian
+                               (*(header + 11) << 8) |
+                               (*(header + 12) << 16) |
+                               (*(header + 13) << 24);
     self->height = *(int32_t*)(header + 22);
     self->width = *(int32_t*)(header + 18);
     self->bpp = *(uint16_t*)(header + 28) / 8;
     set_scanline_padding(self);
     free(header);
     self->buffer = (uint8_t *)calloc(sb.st_size - HEADER_SIZE, sizeof(uint8_t));
-    bytes_read = fread(self->buffer, sizeof(uint8_t), sb.st_size - HEADER_SIZE, fp);
-    if (bytes_read != sb.st_size - HEADER_SIZE) {
+    fseek(fp, pixel_start_pos, SEEK_SET);
+    bytes_read = fread(self->buffer, sizeof(uint8_t), sb.st_size - pixel_start_pos, fp);
+    if (bytes_read != sb.st_size - pixel_start_pos) {
         free(self->buffer);
         fprintf(stderr, "ERROR: could not read BMP data\n");
         return NULL;
