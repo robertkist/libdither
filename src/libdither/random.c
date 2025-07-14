@@ -8,7 +8,7 @@
 #define M_PI (3.14159265358979323846)
 #endif
 
-double rand_float() {
+double rand_float(void) {
     /* returns a random floating point number between 0.0 and 1.0 */
     static bool initialized = false;
     if(!initialized) {

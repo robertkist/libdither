@@ -4,7 +4,7 @@
 #include "libdither.h"
 #include "dither_dotlippens_data.h"
 
-MODULE_API int* create_dot_lippens_cm() {
+MODULE_API int* create_dot_lippens_cm(void) {
     int cm[4][16][16];
     for(size_t i = 0; i < 16; i++) {
         for(size_t j = 0; j < 16; j++) {
@@ -25,8 +25,9 @@ MODULE_API int* create_dot_lippens_cm() {
 
 MODULE_API DotLippensCoefficients* DotLippensCoefficients_new(int width, int height, const int* coefficients) {
     DotLippensCoefficients* self = calloc(1, sizeof(DotLippensCoefficients));
-    self->buffer = (int*)calloc(width * height, sizeof(int));
-    memcpy(self->buffer, coefficients, width * height * sizeof(int));
+    size_t size = (size_t)(width * height);
+    self->buffer = (int*)calloc(size, sizeof(int));
+    memcpy(self->buffer, coefficients, size * sizeof(int));
     self->height = height;
     self->width = width;
     return self;
@@ -40,10 +41,10 @@ MODULE_API void DotLippensCoefficients_free(DotLippensCoefficients* self) {
     }
 }
 
-MODULE_API DotClassMatrix* get_dotlippens_class_matrix() { return DotClassMatrix_new(128, 128, dotlippens_class_matrix); }
-MODULE_API DotLippensCoefficients* get_dotlippens_coefficients1() { return DotLippensCoefficients_new(5, 5, dotlippens1_coe); }
-MODULE_API DotLippensCoefficients* get_dotlippens_coefficients2() { return DotLippensCoefficients_new(5, 5, dotlippens2_coe); }
-MODULE_API DotLippensCoefficients* get_dotlippens_coefficients3() { return DotLippensCoefficients_new(5, 5, dotlippens3_coe); }
+MODULE_API DotClassMatrix* get_dotlippens_class_matrix(void) { return DotClassMatrix_new(128, 128, dotlippens_class_matrix); }
+MODULE_API DotLippensCoefficients* get_dotlippens_coefficients1(void) { return DotLippensCoefficients_new(5, 5, dotlippens1_coe); }
+MODULE_API DotLippensCoefficients* get_dotlippens_coefficients2(void) { return DotLippensCoefficients_new(5, 5, dotlippens2_coe); }
+MODULE_API DotLippensCoefficients* get_dotlippens_coefficients3(void) { return DotLippensCoefficients_new(5, 5, dotlippens3_coe); }
 
 MODULE_API void dotlippens_dither(const DitherImage* img, const DotClassMatrix* class_matrix, const DotLippensCoefficients* coefficients, uint8_t* out) {
     /* Lippens and Philips Dot Dithering
@@ -54,12 +55,13 @@ MODULE_API void dotlippens_dither(const DitherImage* img, const DotClassMatrix* 
         coefficients_sum += (double)coefficients->buffer[i];
     coefficients_sum /= 2.0;
 
-    int* image_cm = (int*)calloc(img->width * img->height, sizeof(int));
-    double* image = (double*)calloc(img->width * img->height, sizeof(double));
+    size_t image_size = (size_t)(img->width * img->height);
+    int* image_cm = (int*)calloc(image_size, sizeof(int));
+    double* image = (double*)calloc(image_size, sizeof(double));
 
     for(int y = 0; y < img->height; y++) {
         for(int x = 0; x < img->width; x++) {
-            size_t addr = y * img->width + x;
+            size_t addr = (size_t)(y * img->width + x);
             image_cm[addr] = class_matrix->buffer[(y % class_matrix->height) * class_matrix->width + (x % class_matrix->width)];
             image[addr] = img->buffer[addr];  // make a copy of the image as we can't modify the original
         }
@@ -69,23 +71,28 @@ MODULE_API void dotlippens_dither(const DitherImage* img, const DotClassMatrix* 
     while(n != 256) {
         for(int y = 0; y < img->height; y++) {
             for (int x = 0; x < img->width; x++) {
-                size_t addr = y * img->width + x;
+                size_t addr = (size_t)(y * img->width + x);
                 if(image_cm[addr] == n) {
-                    double err = image[addr];
-                    if(err > 0.5) {
-                        err -= 1.0;
-                        out[addr] = 0xff;
-                    }
-                    for(int cmy = -half_size; cmy <= half_size; cmy++) {
-                        for(int cmx = -half_size; cmx <= half_size; cmx++) {
-                            int imy = y + cmy;
-                            int imx = x + cmx;
-                            addr = imy * img->width + imx;
-                            if(imy >= 0 && imy < img->height && imx >= 0 && imx < img->width)
-                                if (image_cm[addr] > cmx)
-                                    image[addr] += err * (double)coefficients->buffer[(cmy + half_size) * coefficients->width + (cmx + half_size)] / coefficients_sum;
+                    if (img->transparency[addr] != 0) {
+                        double err = image[addr];
+                        if (err > 0.5) {
+                            err -= 1.0;
+                            out[addr] = 0xff;
                         }
-                    }
+                        for (int cmy = -half_size; cmy <= half_size; cmy++) {
+                            for (int cmx = -half_size; cmx <= half_size; cmx++) {
+                                int imy = y + cmy;
+                                int imx = x + cmx;
+                                addr = (size_t)(imy * img->width + imx);
+                                if (imy >= 0 && imy < img->height && imx >= 0 && imx < img->width)
+                                    if (image_cm[addr] > cmx)
+                                        image[addr] += err * (double) coefficients->buffer[
+                                                (cmy + half_size) * coefficients->width + (cmx + half_size)] /
+                                                       coefficients_sum;
+                            }
+                        }
+                    } else
+                        out[addr] = 128;
                 }
             }
         }

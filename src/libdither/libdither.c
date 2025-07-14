@@ -33,7 +33,7 @@ INITIALIZER(initialize) {
     atexit(finalize);
 }
 
-MODULE_API const char* libdither_version() {
+MODULE_API const char* libdither_version(void) {
 #ifdef LIB_VERSION
     static char version[] = LIB_VERSION;
 #else

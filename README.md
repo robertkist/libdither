@@ -2,66 +2,158 @@
 
 Overview
 --------
-Libdither is a library for black-and-white image dithering, written in C (ANSI C99 standard).
-Libdither has no external dependencies and should compile easily on most current systems.
+Libdither is a library for *black-and-white and color image dithering*, written in C (ANSI C99 standard).
+Libdither has no external dependencies and should compile easily on most current systems (e.g. Windows, Linux, MacOS).
+All you need is a C compiler.
 
-Dithering algorithms:
+<b>This version of libdither is a *Release Candidate*</b>: it has been tested and is working, but minor code cleanup is still required.
 
-* Grid dithering
-* Ordered dithering, incl. Blue Noise dithering
-* Error diffusion dithering
-* Variable error diffusion (Ostromoukhov, Zhou Fang)
-* Pattern dithering
-* Direct Binary Search (DBS) dithering
-* Dot diffusion
-* Kacker and Allebach dithering
-* Riemersma dithering
-* Thresholding
+The black-and-white only libdither version can now be found in the [libdither_mono branch](https://github.com/robertkist/libdither/tree/libdither_mono). 
 
-Other features:
+Features
+--------
 
-* Libdither works in linear color space and takes image gamma into account
+* Color ditherers: error diffusion, ordered dithering
+* Mono ditherers: grid dithering, ordered dithering, error diffusion, variable error diffusion (Ostromoukhov, Zhou Fang),
+  pattern dithering, Direct Binary Search (DBS), dot diffusion, Kacker and Allebach dithering, Riemersma dithering, thresholding
+* Support for color comparison modes: LAB76, LAB94, LAB2000, sRGB, linear, HSV, luminance, Tetrapal
+* Support for color reduction: Median-Cut, Wu, KD-Tree
+* Support for images with transparent background
+* Libdither works in linear color space
 * Dither matrices and inputs can be easily extended without having to change the dither code itself
 * no external dependencies on other libraries
-* tested on Windows (MingW w64 11.2.0, MSVC 2019), Linux (gcc 11.2.0) and macOS (clang 13.1.6)
 * works with C and C++ projects
-* fairly portable code (most prototyping was done in Python)
-* universal binary support (intel and Apple silicon) for macOS
+* supports Windows, Linux, MacOS (universal binary support Intel / Apple silicon), and possible others
 
-Building Libdither
-------------------
-You need an ANSI C compiler and the make utility. Run ```make``` to display all build options. 
-By default, libdither is built for the current architecture. 
-Once compiled, you can find the finished library in the ```dist``` directory.
+License Changes and 3rd-Party Code
+----------------------------------
 
-macOS notes:
+Libdither MIT licensed, but the following code parts have their own permissive license:
 
-* Installing the XCode command line tools is all you need for building libdither
-* You can choose if you want to build a x64, arm64 or universal library. The demo, however, only builds against the current machine's architecture.
+- [kdtree](https://github.com/jtsiomb/kdtree) license: requires inclusion of license terms in source and binary distributions ([more](https://github.com/jtsiomb/kdtree?tab=License-1-ov-file))
+- [uthash](https://github.com/troydhanson/uthash) license: requires inclusion of license terms in source distributions ([more](https://github.com/troydhanson/uthash/blob/master/LICENSE))
 
-Linux notes:
+Examples Color
+--------------
 
-* ```gcc``` and ```make``` is all you need to build libdither. E.g. on Ubuntu you should install build-essential via ```apt``` to get these tools.
+### Palettes:
 
-Windows notes:
+<table>
+<tr>
+    <td><b>Original</b></td>
+    <td><b>EGA palette (16 colors)<br>error diffusion</b></td>
+    <td><b>C64 palette (16 colors)<br>error diffusion</b></td>
+</tr><tr>
+    <td><img src="extra/examples/bike_small.png" width=233 height=255></td>
+    <td><img src="extra/examples/errordiff_dither_EGA.png" width=233 height=255></td>
+    <td><img src="extra/examples/errordiff_dither_C64.png" width=233 height=255></td>
+</tr><tr>
+    <td><b>Pico8 palette (16 colors)<br>error diffusion</b></td>
+    <td><b>EGA palette (16 colors)<br>void dispersed dots</b></td>
+    <td><b>C64 palette (16 colors)<br>void dispersed dots</b></td>
+</tr><tr>
+    <td><img src="extra/examples/errordiff_dither_Pico8.png" width=233 height=255></td>
+    <td><img src="extra/examples/ordered_void-dispersed-dots_dither_EGA.png" width=233 height=255></td>
+    <td><img src="extra/examples/ordered_void-dispersed-dots_dither_C64.png" width=233 height=255></td>
+</tr>
+</table>
 
-* You can build both MingW and MSVC targets from the Makefile (sorry, no .sln)
-* For MingW, open the Makefile and ensure the path (on top of the file) points to your MingW installation directory
-* Install make via Chocolatey package manager from chocolatey.org (https://chocolatey.org/, https://chocolatey.org/packages/make)
+Note: Palettes with a good range of hues and brightness, which matches the source
+image work best. If the overall palette is too dark, or too bright, the image, too,
+will be darker or brighte.
 
-Usage
------
-The ```src/demo``` example shows how to load an image (we use .bmp as it's an easy format to work with), 
-convert it to linear color space, dither it, and write it back to an output .bmp file. The demo was used
-to create all the dithering examples you can see below.
+### Color Quantization:
 
-You can also look at ```libdither.h```, which includes commentary on how to use libdither.
+<table>
+<tr>
+    <td><b>Median-Cut: 16 colors<br>error diffusion</b></td>
+    <td><b>Wu: 16 colors<br>error diffusion</b></td>
+    <td><b>KD-Tree: 16 colors<br>error diffusion</b></td>
+</tr><tr>
+    <td><img src="extra/examples/errordiff_dither_mediancut.png" width=233 height=255></td>
+    <td><img src="extra/examples/errordiff_dither_wu.png" width=233 height=255></td>
+    <td><img src="extra/examples/errordiff_dither_kd.png" width=233 height=255></td>
+</tr>
+</table>
 
-In your own code, you only need to ```#include "libdither.h"```, which includes all public functions
-and data structures, and link the libdither library, either statically or dynamically.
+Note: Median-Cut and Wu are fairly fast, compared to KD-Tree. However, KD-Tree often gives
+the best results.
 
-Examples
---------
+### Color Reduction:
+
+<table>
+<tr>
+    <td><b>Original</b></td>
+    <td><b>Median-Cut: 2 colors<br>error diffusion</b></td>
+    <td><b>Median-Cut: 4 colors<br>error diffusion</b></td>
+</tr><tr>
+    <td><img src="extra/examples/david.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_2.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_4.png" width=220 height=262></td>
+</tr><tr>
+    <td><b>Median-Cut: 8 colors<br>error diffusion</b></td>
+    <td><b>Median-Cut: 16 colors<br>error diffusion</b></td>
+    <td><b>Median-Cut: 32 colors<br>error diffusion</b></td>
+</tr><tr>
+    <td><img src="extra/examples/errordiff_dither_8.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_16.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_32.png" width=220 height=262></td>
+</tr>
+</table>
+
+Note: With a palette that matches the original palette well, 32 colors are often sufficient.
+
+### Color Matching / Color Distance function:
+
+<table>
+<tr>
+    <td><b>LAB '76: 16 colors<br>error diffusion</b></td>
+    <td><b>LAB '04: 16 colors<br>error diffusion</b></td>
+    <td><b>LAB 2000: 16 colors<br>error diffusion</b></td>
+</tr><tr>
+    <td><img src="extra/examples/errordiff_dither_lab76.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_lab94.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_lab2000.png" width=220 height=262></td>
+</tr><tr>
+    <td><b>sRGB: 16 colors<br>error diffusion</b></td>
+    <td><b>sRGB CCIR: 16 colors<br>error diffusion</b></td>
+    <td><b>linear: 16 colors<br>error diffusion</b></td>
+</tr><tr>
+    <td><img src="extra/examples/errordiff_dither_srgb.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_srgb_ccir.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_linear.png" width=220 height=262></td>
+</tr><tr>
+    <td><b>linear: 16 colors<br>error diffusion</b></td>
+    <td><b>linear CCIR: 16 colors<br>error diffusion</b></td>
+    <td><b>HSV: 16 colors<br>error diffusion</b></td>
+</tr><tr>
+    <td><img src="extra/examples/errordiff_dither_linear.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_tetrapal.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_hsv.png" width=220 height=262></td>
+</tr><tr>
+    <td><b>luminance: 4 colors<br>error diffusion</b></td>
+    <td><b>LAB 2000: 4 colors<br>error diffusion</b></td>
+    <td><b>HSV: 4 colors<br>error diffusion</b></td>
+</tr><tr>
+    <td><img src="extra/examples/errordiff_dither_gb_luminance.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_gb_lab2000.png" width=220 height=262></td>
+    <td><img src="extra/examples/errordiff_dither_gb_hsv.png" width=220 height=262></td>
+</tr>
+</table>
+
+Notes:
+
+- Different color distance measuring methods are supported for finding the closest color in the target palette.
+- sRGB distance is a good, universally applicable choice.
+- LAB2000 distance is the most accurate method. It works best with well balanced palettes, where it can pick up even subtle nuances, but it is slow.
+- Luminance distance works best for gradients.
+- CCIR distance methods take human perceptions into account and add a slight saturation boost.
+- Other distance methods may work better than others in certain cases - make sure to try them.
+
+
+
+Examples Mono
+-------------
 
 <table>
 <tr>
@@ -366,3 +458,35 @@ Examples
     <td><img src="https://user-images.githubusercontent.com/9162068/186294959-de3432b6-0961-4372-9afd-75d6b5f19f3d.png"></td>
 </tr>
 </table>
+
+Building Libdither
+------------------
+You need an ANSI C compiler and the make utility. Run ```make``` to display all build options.
+By default, libdither is built for the current architecture.
+Once compiled, you can find the finished library in the ```dist``` directory.
+
+*MacOS notes*:
+
+* Installing the XCode command line tools is all you need for building libdither
+* You can choose if you want to build a x64, arm64 or universal library. The demo, however, only builds against the current machine's architecture.
+
+*Linux notes*:
+
+* ```gcc``` and ```make``` is all you need to build libdither. E.g. on Ubuntu you should install build-essential via ```apt``` to get these tools.
+
+*Windows notes*:
+
+* You can build both MingW and MSVC targets from the Makefile (sorry, no .sln)
+* For MingW, open the Makefile and ensure the path (on top of the file) points to your MingW installation directory
+* Install make via Chocolatey package manager from chocolatey.org (https://chocolatey.org/, https://chocolatey.org/packages/make)
+
+Usage
+-----
+The ```src/demo``` example shows how to load an image (we use .bmp as it's an easy format to work with),
+convert it to linear color space, dither it, and write it back to an output .bmp file. The demo was used
+to create all the dithering examples you can see below.
+
+You can also look at ```libdither.h```, which includes commentary on how to use libdither.
+
+In your own code, you only need to ```#include "libdither.h"```, which includes all public functions
+and data structures, and link the libdither library, either statically or dynamically.

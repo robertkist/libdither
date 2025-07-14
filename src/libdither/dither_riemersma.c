@@ -14,8 +14,8 @@ MODULE_API RiemersmaCurve* RiemersmaCurve_new(int base, int add_adjust, int exp_
     RiemersmaCurve* self = calloc(1, sizeof(RiemersmaCurve));
     self->axiom = (char*)calloc(strlen(axiom) + 1, sizeof(char));
     strcpy(self->axiom, axiom);
-    self->rules = (char**)calloc(rule_count, sizeof(char*));
-    self->keys = (char*)calloc(rule_count, sizeof(char));
+    self->rules = (char**)calloc((size_t)rule_count, sizeof(char*));
+    self->keys = (char*)calloc((size_t)rule_count, sizeof(char));
     for(int i = 0; i < rule_count; i++) {
         self->rules[i] = (char*)calloc(strlen(rules[i]) + 1, sizeof(char));
         strcpy(self->rules[i], rules[i]);
@@ -49,14 +49,14 @@ MODULE_API void RiemersmaCurve_free(RiemersmaCurve* self) {
     }
 }
 
-MODULE_API RiemersmaCurve* get_hilbert_curve() { return RiemersmaCurve_new(2, 0, 0, hilbert_axiom, 2, hilbert_rules, hilbert_keys, hilbert_orientation, center_none); }
-MODULE_API RiemersmaCurve* get_hilbert_mod_curve() { return RiemersmaCurve_new(2, 0, 1, hilbert_mod_axiom, 2, hilbert_mod_rules, hilbert_mod_keys, hilbert_mod_orientation, center_x); }
-MODULE_API RiemersmaCurve* get_peano_curve() { return RiemersmaCurve_new(3, 0, 0, peano_axiom, 2, peano_rules, peano_keys, peano_orientation, center_none); }
-MODULE_API RiemersmaCurve* get_fass0_curve() { return RiemersmaCurve_new(4, 0, 0, fass0_axiom, 2, fass0_rules, fass0_keys, fass0_orientation, center_none); }
-MODULE_API RiemersmaCurve* get_fass1_curve() { return RiemersmaCurve_new(3, 0, 0, fass1_axiom, 2, fass1_rules, fass1_keys, fass1_orientation, center_none); }
-MODULE_API RiemersmaCurve* get_fass2_curve() { return RiemersmaCurve_new(4, 0, 0, fass2_axiom, 2, fass2_rules, fass2_keys, fass2_orientation, center_none); }
-MODULE_API RiemersmaCurve* get_gosper_curve() { return RiemersmaCurve_new(5, -1, 0, gosper_axiom, 2, gosper_rules, gosper_keys, gosper_orientation, center_none); }
-MODULE_API RiemersmaCurve* get_fass_spiral_curve() { return RiemersmaCurve_new(3, 0, 0, fass_spiral_axiom, 3, fass_spiral_rules, fass_spiral_keys, fass_spiral_orientation, center_xy); }
+MODULE_API RiemersmaCurve* get_hilbert_curve(void) { return RiemersmaCurve_new(2, 0, 0, hilbert_axiom, 2, hilbert_rules, hilbert_keys, hilbert_orientation, center_none); }
+MODULE_API RiemersmaCurve* get_hilbert_mod_curve(void) { return RiemersmaCurve_new(2, 0, 1, hilbert_mod_axiom, 2, hilbert_mod_rules, hilbert_mod_keys, hilbert_mod_orientation, center_x); }
+MODULE_API RiemersmaCurve* get_peano_curve(void) { return RiemersmaCurve_new(3, 0, 0, peano_axiom, 2, peano_rules, peano_keys, peano_orientation, center_none); }
+MODULE_API RiemersmaCurve* get_fass0_curve(void) { return RiemersmaCurve_new(4, 0, 0, fass0_axiom, 2, fass0_rules, fass0_keys, fass0_orientation, center_none); }
+MODULE_API RiemersmaCurve* get_fass1_curve(void) { return RiemersmaCurve_new(3, 0, 0, fass1_axiom, 2, fass1_rules, fass1_keys, fass1_orientation, center_none); }
+MODULE_API RiemersmaCurve* get_fass2_curve(void) { return RiemersmaCurve_new(4, 0, 0, fass2_axiom, 2, fass2_rules, fass2_keys, fass2_orientation, center_none); }
+MODULE_API RiemersmaCurve* get_gosper_curve(void) { return RiemersmaCurve_new(5, -1, 0, gosper_axiom, 2, gosper_rules, gosper_keys, gosper_orientation, center_none); }
+MODULE_API RiemersmaCurve* get_fass_spiral_curve(void) { return RiemersmaCurve_new(3, 0, 0, fass_spiral_axiom, 3, fass_spiral_rules, fass_spiral_keys, fass_spiral_orientation, center_xy); }
 
 int get_rule_size(char *rule, char rule_key[], int rule_count) {
     /* A helper function for allocating memory for the generated curve */
@@ -87,7 +87,7 @@ MODULE_API char* create_curve(RiemersmaCurve* curve, int width, int height, int*
     if(iterations == -1)
         return NULL;
     // determine memory heuristics
-    size_t* rule_len = (size_t*)calloc(curve->rule_count, sizeof(size_t));
+    size_t* rule_len = (size_t*)calloc((size_t)curve->rule_count, sizeof(size_t));
     float max_rule_size = 0.0;
     size_t max_rule_strlen = 0;
     for(int i=0; i < curve->rule_count; i ++) {
@@ -104,7 +104,7 @@ MODULE_API char* create_curve(RiemersmaCurve* curve, int width, int height, int*
     char* axiom = (char*)calloc(strlen(curve->axiom) + 1, sizeof(char));
     strcpy(axiom, curve->axiom);
     for(int i = 0; i < iterations; i++) {
-        size_t bufsize = (int)ceil((double)(strlen(axiom) + 1) * max_rule_size + 1) * max_rule_strlen + 1;
+        size_t bufsize = (size_t)ceil((double)(strlen(axiom) + 1) * max_rule_size + 1) * max_rule_strlen + 1;
         char* out = (char*)calloc(bufsize, sizeof(char));
         char* p = out;
         size_t axlen = strlen(axiom);
@@ -135,9 +135,9 @@ void riemersma_dither(const DitherImage* img, RiemersmaCurve* rcurve, bool use_r
      */
     int max = 16;
     int err_len = use_riemersma? 16 : 8;
-    Queue* q_err = Queue_new(err_len);
+    Queue* q_err = Queue_new((size_t)err_len);
     // set up weights
-    double* weights = calloc(err_len, sizeof(double));
+    double* weights = calloc((size_t)err_len, sizeof(double));
     if(use_riemersma) {  // original riemersma algorithm
         double m = exp(log((float)max) / (float)(err_len - 1));
         double v = 1.0;
@@ -174,26 +174,31 @@ void riemersma_dither(const DitherImage* img, RiemersmaCurve* rcurve, bool use_r
             x += rx;
             y += ry;
             if (x >= 0 && y >= 0 && x < img->width && y < img->height) {
-                size_t addr = y * img->width + x;
+                size_t addr = (size_t)(y * img->width + x);
+
                 double err = 0.0;
                 for(int i = 0; i < err_len; i++) {
                     err += q_err->queue[i] * (double)weights[i];
                 }
                 Queue_rotate(q_err);
-                double p = img->buffer[addr];
-                if(use_riemersma) {  // original riemersma algorithm
-                    if(p + err / max > 0.5) {
-                        out[addr] = 0xff;
-                        q_err->queue[err_len - 1] = p - 1.0;
-                    } else
-                        q_err->queue[err_len - 1] = p;
-                } else {  // modified riemersma algorithm
-                    if(err + p > 0.5) {
-                        out[addr] = 0xff;
-                        q_err->queue[err_len - 1] = err + p - 1.0;
-                    } else
-                        q_err->queue[err_len - 1] = err + p;
-                }
+
+                if (img->transparency[addr] != 0) {
+                    double p = img->buffer[addr];
+                    if (use_riemersma) {  // original riemersma algorithm
+                        if (p + err / max > 0.5) {
+                            out[addr] = 0xff;
+                            q_err->queue[err_len - 1] = p - 1.0;
+                        } else
+                            q_err->queue[err_len - 1] = p;
+                    } else {  // modified riemersma algorithm
+                        if (err + p > 0.5) {
+                            out[addr] = 0xff;
+                            q_err->queue[err_len - 1] = err + p - 1.0;
+                        } else
+                            q_err->queue[err_len - 1] = err + p;
+                    }
+                } else
+                    out[addr] = 128;
             }
         } else if (*c == '+') {
             int dx = ry; ry = -rx; rx = dx;

@@ -14,7 +14,8 @@ MODULE_API void variable_error_diffusion_dither(const DitherImage* img, enum Var
     const int m_offset_x[2][3] = {{1, -1, 0}, {-1, 1, 0}};
     const int m_offset_y[2][3] = {{0, 1, 1}, {0, 1, 1}};
 
-    double* buffer = calloc(img->width * img->height, sizeof(double));
+    size_t image_size = (size_t)(img->width * img->height);
+    double* buffer = calloc(image_size, sizeof(double));
     const long* divs;
     const long* coefs;
     if(type == Ostromoukhov) {
@@ -23,7 +24,7 @@ MODULE_API void variable_error_diffusion_dither(const DitherImage* img, enum Var
     } else {  // zhoufang
         coefs = zhoufang_coef;
         divs = zhoufang_divs;
-        memcpy(buffer, img->buffer, img->width * img->height * sizeof(double));
+        memcpy(buffer, img->buffer, image_size * sizeof(double));
     }
     // serpentine direction setup
     int direction = 0; // FORWARD
@@ -45,37 +46,40 @@ MODULE_API void variable_error_diffusion_dither(const DitherImage* img, enum Var
         for (int x = start; x != end; x += step) {
             double err;
             int coef_offs;
-            size_t addr = y * img->width + x;
-            double px = img->buffer[addr];
-            // dither function
-            if(type == Ostromoukhov) {   // ostro
-                err = buffer[addr] + px;
-                if (err > 0.5) {
-                    out[addr] = 0xff;
-                    err -= 1.0;
-                }
-            } else {  // zhoufang
-                err = buffer[addr];
-                if (px >= 0.5)
-                    px = 1.0 - px;
-                double threshold = (128.0 + (rand() % 128) * (rand_scale[(int)(px * 128.0)] / 100.0)) / 256.0;
-                if (err >= threshold) {
-                    out[addr] = 0xff;
-                    err = buffer[addr] - 1.0;
-                }
-            }
-            coef_offs = (int) (px * 255.0 + 0.5);
-            // distribute the error
-            err /= (double)divs[coef_offs];
-            for(int i = 0; i < 3; i++) {
-                int xx = x + m_offset_x[direction][i];
-                if(-1 < xx && xx < img->width) {
-                    int yy = y + m_offset_y[direction][i];
-                    if(yy < img->height) {
-                        buffer[yy * img->width + xx] += err * (double)coefs[coef_offs * 3 + i];
+            size_t addr = (size_t)(y * img->width + x);
+            if (img->transparency[addr] != 0) {
+                double px = img->buffer[addr];
+                // dither function
+                if (type == Ostromoukhov) {   // ostro
+                    err = buffer[addr] + px;
+                    if (err > 0.5) {
+                        out[addr] = 0xff;
+                        err -= 1.0;
+                    }
+                } else {  // zhoufang
+                    err = buffer[addr];
+                    if (px >= 0.5)
+                        px = 1.0 - px;
+                    double threshold = (128.0 + (rand() % 128) * (rand_scale[(int) (px * 128.0)] / 100.0)) / 256.0;
+                    if (err >= threshold) {
+                        out[addr] = 0xff;
+                        err = buffer[addr] - 1.0;
                     }
                 }
-            }
+                coef_offs = (int) (px * 255.0 + 0.5);
+                // distribute the error
+                err /= (double) divs[coef_offs];
+                for (int i = 0; i < 3; i++) {
+                    int xx = x + m_offset_x[direction][i];
+                    if (-1 < xx && xx < img->width) {
+                        int yy = y + m_offset_y[direction][i];
+                        if (yy < img->height) {
+                            buffer[yy * img->width + xx] += err * (double) coefs[coef_offs * 3 + i];
+                        }
+                    }
+                }
+            } else
+                out[addr] = 128;
         }
         direction = (y + 1) % direction_toggle;
     }

@@ -5,17 +5,18 @@
 #include "libdither.h"
 #include "dither_pattern_data.h"
 
-MODULE_API TilePattern* get_2x2_pattern() { return TilePattern_new(2, 2, 5, tiles2x2); }
-MODULE_API TilePattern* get_3x3_v1_pattern() { return TilePattern_new(3, 3, 13, tiles3x3_v1); }
-MODULE_API TilePattern* get_3x3_v2_pattern() { return TilePattern_new(3, 3, 10, tiles3x3_v2); }
-MODULE_API TilePattern* get_3x3_v3_pattern() { return TilePattern_new(3, 3, 10, tiles3x3_v3); }
-MODULE_API TilePattern* get_4x4_pattern() { return TilePattern_new(4, 4, 6, tiles4x4); }
-MODULE_API TilePattern* get_5x2_pattern() { return TilePattern_new(5, 2, 7, tiles5x2); }
+MODULE_API TilePattern* get_2x2_pattern(void) { return TilePattern_new(2, 2, 5, tiles2x2); }
+MODULE_API TilePattern* get_3x3_v1_pattern(void) { return TilePattern_new(3, 3, 13, tiles3x3_v1); }
+MODULE_API TilePattern* get_3x3_v2_pattern(void) { return TilePattern_new(3, 3, 10, tiles3x3_v2); }
+MODULE_API TilePattern* get_3x3_v3_pattern(void) { return TilePattern_new(3, 3, 10, tiles3x3_v3); }
+MODULE_API TilePattern* get_4x4_pattern(void) { return TilePattern_new(4, 4, 6, tiles4x4); }
+MODULE_API TilePattern* get_5x2_pattern(void) { return TilePattern_new(5, 2, 7, tiles5x2); }
 
 MODULE_API TilePattern* TilePattern_new(int width, int height, int num_tiles, const int* pattern) {
     TilePattern* self = calloc(1, sizeof(TilePattern));
-    self->buffer = (int*)calloc(width * height * num_tiles, sizeof(int));
-    memcpy(self->buffer, pattern, width * height * num_tiles * sizeof(int));
+    size_t size = (size_t)(width * height * num_tiles);
+    self->buffer = (int*)calloc(size, sizeof(int));
+    memcpy(self->buffer, pattern, size * sizeof(int));
     self->width = width;
     self->height = height;
     self->num_tiles = num_tiles;
@@ -39,8 +40,8 @@ MODULE_API void pattern_dither(const DitherImage* img, const TilePattern *patter
     int width = (int)((float)img->width / (float)tw);
     int height = (int)((float)img->height / (float)th);
     // diffusion matrix
-    double* cur = (double*)calloc(tile_size, sizeof(double));
-    double* diffusion = (double*)calloc(tile_size, sizeof(double));
+    double* cur = (double*)calloc((size_t)tile_size, sizeof(double));
+    double* diffusion = (double*)calloc((size_t)tile_size, sizeof(double));
     double init_diffusion = 1.0 / (float)(tile_size);
     for(int i = 0; i < tile_size; i++)
         diffusion[i] = init_diffusion;
@@ -59,8 +60,8 @@ MODULE_API void pattern_dither(const DitherImage* img, const TilePattern *patter
                 double d2 = 0.0;
                 for(int ty = 0; ty < th; ty++) {
                     for(int tx = 0; tx < tw; tx++) {
-                        size_t addr = ty * tw + tx;
-                        size_t tile_addr = n * tile_size + addr;
+                        size_t addr = (size_t)(ty * tw + tx);
+                        size_t tile_addr = (size_t)(n * tile_size) + addr;
                         d1 += diffusion[addr] * (cur[addr] - pattern->buffer[tile_addr]);
                         d2 += diffusion[addr] * fabs(cur[addr] - pattern->buffer[tile_addr]);
                     }
@@ -76,6 +77,10 @@ MODULE_API void pattern_dither(const DitherImage* img, const TilePattern *patter
                     if(pattern->buffer[best_tile * tile_size + (ty * tw + tx)] == 1)
                         out[(y * th + ty) * img->width + (x * tw + tx)] = 0xff;
         }
+    }
+    // apply transparency
+    for (size_t i = 0; i < (size_t)(img->width * img->height); i++) {
+        out[i] = img->transparency[i] != 0 ? out[i] : 128;
     }
     free(cur);
     free(diffusion);

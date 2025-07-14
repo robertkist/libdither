@@ -16,7 +16,7 @@ MODULE_API void kallebach_dither(const DitherImage* img, bool random, uint8_t* o
     const int dither_array_count = 4;
     int height_map_m = (int)ceil((double)img->height / (double)dither_array_size);
     int width_map_m = (int)ceil((double)img->width / (double)dither_array_size);
-    short* map = (short*)calloc((width_map_m + 1) * (height_map_m + 1), sizeof(short));
+    short* map = (short*)calloc((size_t)((width_map_m + 1) * (height_map_m + 1)), sizeof(short));
     int current_index = 0;
     for(int i = 0; i < img->height; i += dither_array_size) {
         for(int j = 0; j < img->width; j += dither_array_size) {
@@ -36,9 +36,12 @@ MODULE_API void kallebach_dither(const DitherImage* img, bool random, uint8_t* o
                             int im = i + m;
                             int jn = j + n;
                             if(im >=0 && im < img->height && jn >=0 && jn < img->width) {
-                                size_t addr = im * img->width + jn;
-                                if(img->buffer[addr] * 256.0 > dither_arrays[current_index][m][n])
-                                    out[addr] = 0xff;
+                                size_t addr = (size_t)(im * img->width + jn);
+                                if (img->transparency[addr] != 0) {
+                                    if (img->buffer[addr] * 256.0 > dither_arrays[current_index][m][n])
+                                        out[addr] = 0xff;
+                                } else
+                                    out[addr] = 128;
                             }
                         }
                     }

@@ -12,7 +12,7 @@ typedef struct Private_DoubleMatrix Matrix;
 
 Matrix* Matrix_new(int width, int height) {
     Matrix* self = calloc(1, sizeof(Matrix));
-    self->buffer = (double*)calloc(width * height, sizeof(double));
+    self->buffer = (double*)calloc((size_t)(width * height), sizeof(double));
     self->width = width;
     self->height = height;
     return self;
@@ -92,7 +92,11 @@ void get_cep(const DitherImage* img, int width, int height, int v, Matrix** cpp,
     Matrix* err = Matrix_new(width, height);
     for(int y = 0, i = 0; y < height; y++) {
         for(int x = 0; x < width; x++, i++) {
-            err->buffer[i] = 0.0 - img->buffer[i];
+
+            if (img->transparency[i] != 0)
+                err->buffer[i] = 0.0 - img->buffer[i];
+            else
+                err->buffer[i] = 0.0;
         }
     }
     conv2d(err, *cpp, cep);
@@ -108,8 +112,8 @@ MODULE_API void dbs_dither(const DitherImage* img, int v, uint8_t* out) {
     Matrix* cep = NULL;
     Matrix* cpp = NULL;
     const int half_cpp_size = 6;
-    get_cep(img,img->width, img->height, v, &cpp, &cep);
-    int8_t* dst = (int8_t*)calloc(img->width * img->height, sizeof(int8_t));
+    get_cep(img, img->width, img->height, v, &cpp, &cep);
+    int8_t* dst = (int8_t*)calloc((size_t)(img->width * img->height), sizeof(int8_t));
     while(1) {
         int count_b = 0;
         for(int i = 0; i < img->height; i++) {
@@ -124,7 +128,7 @@ MODULE_API void dbs_dither(const DitherImage* img, int v, uint8_t* out) {
                         double eps = 0.0;
                         if(j + x < 0 || j + x >= img->width)
                             continue;
-                        size_t addr = i * img->width + j;
+                        size_t addr = (size_t)(i * img->width + j);
                         if(y == 0 && x == 0) {
                             a1 = 0;
                             a0 = dst[addr] == 1? -1 : 1;
@@ -169,9 +173,14 @@ MODULE_API void dbs_dither(const DitherImage* img, int v, uint8_t* out) {
         if(count_b == 0)
             break;
     }
-    for(size_t i = 0; i < (size_t)(img->width * img->height); i++)
-        if(dst[i] == 1)
-            out[i] = 0xff;
+    for(size_t i = 0; i < (size_t)(img->width * img->height); i++) {
+        if (dst[i] == 1) {
+            out[i] = 255;
+        } else {
+            out[i] = img->transparency[i] != 0 ? 0 : 128;
+        }
+    }
+
     free(dst);
     Matrix_free(cpp);
     Matrix_free(cep);

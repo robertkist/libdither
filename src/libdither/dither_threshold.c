@@ -9,7 +9,7 @@ MODULE_API double auto_threshold(const DitherImage* img) {
     double avg = 0.0;
     double min = 1.0;
     double max = 0.0;
-    size_t imgsize = img -> width * img -> height;
+    size_t imgsize = (size_t)(img -> width * img -> height);
     for(size_t i = 0; i < imgsize; i++) {
         double c = gamma_encode(img -> buffer[i]);
         avg += c;
@@ -32,11 +32,14 @@ MODULE_API void threshold_dither(const DitherImage* img, double threshold, doubl
     threshold = (0.5 * noise + threshold * (1.0 - noise));
     for(int y = 0; y < img -> height; y++) {
         for(int x = 0; x < img -> width; x++) {
-            double px = img -> buffer[addr];
-            if(noise > 0)
-                px += (rand_float() - 0.5) * noise;
-            if(px > threshold)
-                out[addr] = 0xff;
+            if (img->transparency[addr] != 0) {
+                double px = img->buffer[addr];
+                if (noise > 0)
+                    px += (rand_float() - 0.5) * noise;
+                if (px > threshold)
+                    out[addr] = 0xff;
+            } else
+                out[addr] = 128;
             addr++;
         }
     }
