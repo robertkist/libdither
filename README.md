@@ -49,8 +49,8 @@ Examples Color
     <td><img src="extra/examples/errordiff_dither_C64.png" width=233 height=255></td>
 </tr><tr>
     <td><b>Pico8 palette (16 colors)<br>error diffusion</b></td>
-    <td><b>EGA palette (16 colors)<br>void dispersed dots</b></td>
-    <td><b>C64 palette (16 colors)<br>void dispersed dots</b></td>
+    <td><b>EGA palette (16 colors)<br>ordered dithering</b></td>
+    <td><b>C64 palette (16 colors)<br>ordered dithering</b></td>
 </tr><tr>
     <td><img src="extra/examples/errordiff_dither_Pico8.png" width=233 height=255></td>
     <td><img src="extra/examples/ordered_void-dispersed-dots_dither_EGA.png" width=233 height=255></td>
@@ -148,9 +148,8 @@ Notes:
 - LAB2000 distance is the most accurate method. It works best with well balanced palettes, where it can pick up even subtle nuances, but it is slow.
 - Luminance distance works best for gradients.
 - CCIR distance methods take human perceptions into account and add a slight saturation boost.
+- Tetrapal: works best for ordered dithering and pre-composed palettes (i.e. non quantified), such as EGA, C64, MS Paint palettes.
 - Other distance methods may work better than others in certain cases - make sure to try them.
-
-
 
 Examples Mono
 -------------
