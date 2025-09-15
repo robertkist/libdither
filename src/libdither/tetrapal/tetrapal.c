@@ -772,7 +772,8 @@ static inline coord_t distance_squared_3d(const coord_t a[3], const coord_t b[3]
 static inline int128_t int128_zero(void)
 {
 	int128_t result;
-	result.digits[0] = result.digits[1] = result.sign = 0;
+	result.digits[0] = result.digits[1] = 0;
+	result.sign = 0;
 	return result;
 }
 
@@ -787,7 +788,7 @@ static inline int128_t int128_from_product(const double a, const double b)
 		return result;
 
 	/* Get the sign of the product. */
-	result.sign = (a < 0) == (b < 0) ? 1 : -1;
+	result.sign = (char)((a < 0) == (b < 0) ? 1 : -1);
 
 	/* Get the magnitude of the two doubles and seperate into higher and lower parts. */
 	digit_t a_digit = (digit_t)fabs(a);
@@ -896,14 +897,14 @@ static inline int128_t int128_abs(const int128_t a)
 static inline int128_t int128_neg(const int128_t a)
 {
 	int128_t result = a;
-	result.sign = a.sign != 0 ? -1 : 0;
+	result.sign = (char)(a.sign != 0 ? -1 : 0);
 	return result;
 }
 
 static inline int128_t int128_inv(const int128_t a)
 {
 	int128_t result = a;
-	result.sign = a.sign < 0 ? 1 : (a.sign > 0 ? -1 : 0);
+	result.sign = (char)(a.sign < 0 ? 1 : (a.sign > 0 ? -1 : 0));
 	return result;
 }
 
@@ -1117,7 +1118,7 @@ static error_t stack_check_capacity(Stack* stack)
 		return ERROR_NONE;
 
 	/* Stack is at capacity; resize. */
-	size_t new_capacity = (size_t)(stack->capacity * ARRAY_GROWTH_FACTOR) + 1;
+	size_t new_capacity = (stack->capacity * (size_t)ARRAY_GROWTH_FACTOR) + 1;
 	void* new_data = TETRAPAL_REALLOC(stack->data, sizeof(*stack->data) * new_capacity);
 
 	if (new_data == NULL)
@@ -1386,7 +1387,7 @@ static error_t cavity_check_capacity(Cavity* cavity)
 	if (cavity->facets.count < cavity->facets.capacity)
 		return ERROR_NONE;
 
-	size_t new_capacity = (size_t)(cavity->facets.capacity * ARRAY_GROWTH_FACTOR) + 1;
+	size_t new_capacity = (cavity->facets.capacity * (size_t)ARRAY_GROWTH_FACTOR) + 1;
 	void* new_incident = TETRAPAL_REALLOC(cavity->facets.incident_vertex, sizeof(*cavity->facets.incident_vertex) * new_capacity * 3);
 	void* new_adjacent = TETRAPAL_REALLOC(cavity->facets.adjacent_simplex, sizeof(*cavity->facets.adjacent_simplex) * new_capacity);
 	void* new_boundary = TETRAPAL_REALLOC(cavity->facets.boundary_facet, sizeof(*cavity->facets.boundary_facet) * new_capacity);
@@ -1441,7 +1442,7 @@ static error_t cavity_table_check_capacity(Cavity* cavity)
 	vertex_t* old_edge = cavity->table.edge;
 	facet_t* old_facet = cavity->table.facet;
 
-	size_t new_capacity = (size_t)(cavity->table.capacity * ARRAY_GROWTH_FACTOR) + 1;
+	size_t new_capacity = (cavity->table.capacity * (size_t)ARRAY_GROWTH_FACTOR) + 1;
 	vertex_t* new_edge = TETRAPAL_MALLOC(sizeof(*cavity->table.edge) * new_capacity * 3);
 	facet_t* new_facet = TETRAPAL_MALLOC(sizeof(*cavity->table.facet) * new_capacity);
 
@@ -2053,7 +2054,7 @@ static error_t check_simplices_capacity(Tetrapal* tetrapal)
 		return ERROR_NONE;
 
 	/* Arrays are at capacity; resize. */
-	size_t new_capacity = (size_t)(tetrapal->simplices.capacity * ARRAY_GROWTH_FACTOR) + 1;
+	size_t new_capacity = (tetrapal->simplices.capacity * (size_t)ARRAY_GROWTH_FACTOR) + 1;
 	void* new_incident = TETRAPAL_REALLOC(tetrapal->simplices.incident_vertex, sizeof(*tetrapal->simplices.incident_vertex) * new_capacity * simplex_size(tetrapal));
 	void* new_adjacent = TETRAPAL_REALLOC(tetrapal->simplices.adjacent_simplex, sizeof(*tetrapal->simplices.adjacent_simplex) * new_capacity * simplex_size(tetrapal));
 	void* new_flags = TETRAPAL_REALLOC(tetrapal->simplices.flags, sizeof(*tetrapal->simplices.flags) * new_capacity);
@@ -2080,7 +2081,7 @@ static error_t check_deleted_capacity(Tetrapal* tetrapal)
 		return ERROR_NONE;
 
 	/* Arrays are at capacity; resize. */
-	size_t new_capacity = (size_t)(tetrapal->simplices.deleted.capacity * ARRAY_GROWTH_FACTOR) + 1;
+	size_t new_capacity = (tetrapal->simplices.deleted.capacity * (size_t)ARRAY_GROWTH_FACTOR) + 1;
 	void* new_data = TETRAPAL_REALLOC(tetrapal->simplices.deleted.simplices, sizeof(*tetrapal->simplices.deleted.simplices) * new_capacity);
 
 	if (new_data == NULL)
@@ -3724,7 +3725,7 @@ WALK_HULL:
 
 		for (local_t a = 0; a < 2; a++)
 		{
-			local_t b = (a + 1) % 2;
+			local_t b = (local_t)(a + 1) % 2;
 
 			/* Is the point before [a]? */
 			coord_t ab[2], ap[2];

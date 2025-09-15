@@ -34,6 +34,7 @@ OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <alloca.h>
 #include "kdtree.h"
 
 #if defined(WIN32) || defined(__WIN32__)

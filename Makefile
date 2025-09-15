@@ -19,7 +19,7 @@ OBJ=$(patsubst %.c, $(OBJDIR)/%.o, $(SRC))
 OBJFILES=$(patsubst %.c, %.o, $(SRC))
 
 CFLAGS=-std=c11 -Wall -Wextra -Wconversion -Wshadow -Wstrict-overflow -Wformat=2 -Wundef -fno-common -O3 -Os \
-		        -Wpedantic -pedantic -Werror -D"LIB_VERSION=\"$(LIB_VERSION)\""
+		        -Wpedantic -pedantic -Werror -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable -D"LIB_VERSION=\"$(LIB_VERSION)\""
 
 ifdef OS  # Windows:
 define fn_mkdir
@@ -44,6 +44,7 @@ endef
 		CC=gcc
 		LIBEXT=so
 		UNIXFLAGS=-Wl,-R.
+		CFLAGS+=-Wno-type-limits
 	endif
 endif
 

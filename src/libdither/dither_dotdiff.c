@@ -12,7 +12,7 @@ struct Point {
 };
 typedef struct Point Point;
 
-struct DotDitherHashEntry { // TODO rename
+struct DotDitherHashEntry {
     int key;                   /* key */
     Point point;
     UT_hash_handle hh;         /* makes this structure hashable */
@@ -99,11 +99,16 @@ MODULE_API void dot_diffusion_dither(const DitherImage* img, const DotDiffusionM
             int ofs_x = xx * blocksize;
             for(int current_point_no = 0; current_point_no < blocksize * blocksize; current_point_no++) {
                 HASH_FIND(hh, lut, &current_point_no, sizeof(int), hash_item);
-                Point *cm = &hash_item->point;
+                Point* cm = &hash_item->point;
                 int imgx = cm->x + ofs_x;
                 int imgy = cm->y + ofs_y;
+                if (imgx < 0 || imgx >= img->width || imgy < 0 || imgy >= img->height) {
+                    continue;
+                }
                 size_t addr = (size_t)(imgy * img->width + imgx);
-                if (img->transparency[addr] != 0) {
+                if (img->transparency[addr] == 0) {
+                    out[addr] = 0x80;
+                } else {
                     if (cm->y + ofs_y >= img->height || cm->x + ofs_x >= img->width)
                         continue;
                     double err = orig_img[addr];
@@ -137,16 +142,16 @@ MODULE_API void dot_diffusion_dither(const DitherImage* img, const DotDiffusionM
                             int point_no = pixel_no[i];
                             double sub_weight = pixel_weight[i];
                             HASH_FIND(hh, lut, &point_no, sizeof(int), hash_item);
-                            Point *c = &hash_item->point;
-                            int cx = c->x + ofs_x;
-                            int cy = c->y + ofs_y;
-                            if (cx < img->width && cy < img->height) {
-                                orig_img[cy * img->width + cx] += (err * sub_weight);
+                            if (hash_item != NULL) {
+                                Point *c = &hash_item->point;
+                                int cx = c->x + ofs_x;
+                                int cy = c->y + ofs_y;
+                                if (cx < img->width && cy < img->height) {
+                                    orig_img[cy * img->width + cx] += (err * sub_weight);
+                                }
                             }
                         }
                     }
-                } else {
-                    out[addr] = 128;
                 }
             }
         }

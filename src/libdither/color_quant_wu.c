@@ -105,10 +105,13 @@ static void M3d(long* vwt, long* vmr, long* vmg, long* vmb, double* m2_) {
     long line, line_r, line_g, line_b, area[33], area_r[33], area_g[33], area_b[33];
     double line2, area2[33];
     for(r = 1; r <= 32; ++r) {
-        for(i = 0; i <= 32; ++i)
-            area2[i] = area[i] = area_r[i] = area_g[i] = area_b[i] = 0;
+        for(i = 0; i <= 32; ++i) {
+            area[i] = area_r[i] = area_g[i] = area_b[i] = 0;
+            area2[i] = 0.0;
+        }
         for(g = 1; g <= 32; ++g) {
-            line2 = line = line_r = line_g = line_b = 0;
+            line = line_r = line_g = line_b = 0;
+            line2 = 0.0;
             for(b = 1; b <= 32; ++b) {
                 ind1 = (unsigned short)((r << 10) + (r << 6) + r + (g << 5) + g + b); /* [r][g][b] */
                 line += vwt[ind1];
@@ -206,9 +209,9 @@ static double Var(Box* cube) {
     /* Compute the weighted variance of a box */
     /* NB: as with the raw statistics, this is really the variance * size */
     double dr, dg, db, xx;
-    dr = Vol(cube, shared->mr);
-    dg = Vol(cube, shared->mg);
-    db = Vol(cube, shared->mb);
+    dr = (double)Vol(cube, shared->mr);
+    dg = (double)Vol(cube, shared->mg);
+    db = (double)Vol(cube, shared->mb);
     xx =   shared->m2[cube->r1][cube->g1][cube->b1]
           -shared->m2[cube->r1][cube->g1][cube->b0]
           -shared->m2[cube->r1][cube->g0][cube->b1]
@@ -248,8 +251,7 @@ static double Maximize(Box* cube, uint8_t dir, int first, int last, int* cut,
         if (half_w == 0) {      /* subbox could be empty of pixels! */
             continue;           /* never split into an empty box */
         } else
-            temp = ((double)half_r*half_r + (double)half_g*half_g +
-                    (double)half_b*half_b)/half_w;
+            temp = (double)(half_r * half_r + half_g * half_g + half_b * half_b) / (double)half_w;
         half_r = whole_r - half_r;
         half_g = whole_g - half_g;
         half_b = whole_b - half_b;
@@ -257,8 +259,7 @@ static double Maximize(Box* cube, uint8_t dir, int first, int last, int* cut,
         if (half_w == 0) {      /* subbox could be empty of pixels! */
             continue;           /* never split into an empty box */
         } else
-            temp += ((double)half_r * half_r + (double)half_g * half_g +
-                     (double)half_b * half_b) / half_w;
+            temp += (double)(half_r * half_r + half_g * half_g + half_b * half_b) / (double)half_w;
         if (temp > max) {
             max = temp;
             *cut = i;

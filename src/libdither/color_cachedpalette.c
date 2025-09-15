@@ -181,6 +181,7 @@ static size_t find_closest_color(const CachedPalette* palette, const FloatColor*
     double (*functionPtr)(const FloatColor*, const FloatColor*);
     double (*functionPtrLab)(const FloatColor*, const FloatColor*, const FloatColor*);
     functionPtr = &distance_linear;
+    functionPtrLab = &distance_lab94;
     FloatColor fc;
     switch(palette->mode) {    // convert input color
         case HSV:
@@ -210,7 +211,6 @@ static size_t find_closest_color(const CachedPalette* palette, const FloatColor*
             break;
         case LAB94:
             rgb_to_lab(x, &fc, &palette->lab_illuminant);
-            functionPtrLab = &distance_lab94;
             break;
         case LAB2000:
             rgb_to_lab(x, &fc, &palette->lab_illuminant);
@@ -309,7 +309,7 @@ static void init_color_extremes_struct(ColorExtremes* ce, bool include_bw, bool 
     }
     ce->ref_color[IDXL].r = ce->ref_color[IDXL].g = ce->ref_color[IDXL].b = 1.0;
     ce->ref_color[IDXR].r = ce->ref_color[IDXG].g = ce->ref_color[IDXB].b = 1.0;
-    ce->ref_color[IDXC].r = ce->ref_color[IDXC].r = 1.0;
+    ce->ref_color[IDXC].r = ce->ref_color[IDXC].g = 1.0;
     ce->ref_color[IDXM].g = ce->ref_color[IDXM].b = 1.0;
     ce->ref_color[IDXY].r = ce->ref_color[IDXY].b = 1.0;
     ce->include_cmy = include_cmy;
