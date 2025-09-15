@@ -1757,11 +1757,11 @@ int tetrapal_number_of_elements(const Tetrapal* tetrapal)
 		for (size_t i = 0; i < tetrapal->simplices.count; i++)
 		{
 			/* Skip infinite simplices. */
-			if (is_infinite_simplex(tetrapal, i) == true)
+			if (is_infinite_simplex(tetrapal, (simplex_t)i) == true)
 				continue;
 
 			/* Skip free simplices. */
-			if (is_free_simplex(tetrapal, i) == true)
+			if (is_free_simplex(tetrapal, (simplex_t)i) == true)
 				continue;
 
 			count += 1;
@@ -1818,11 +1818,11 @@ int tetrapal_get_elements(const Tetrapal* tetrapal, int* buffer)
 		for (size_t i = 0; i < tetrapal->simplices.count; i++)
 		{
 			/* Skip infinite simplices. */
-			if (is_infinite_simplex(tetrapal, i) == true)
+			if (is_infinite_simplex(tetrapal, (simplex_t)i) == true)
 				continue;
 
 			/* Skip free simplices. */
-			if (is_free_simplex(tetrapal, i) == true)
+			if (is_free_simplex(tetrapal, (simplex_t)i) == true)
 				continue;
 
 			for (int j = 0; j < stride; j++)
@@ -2150,12 +2150,12 @@ static size_t find_first_simplex(Tetrapal* tetrapal, const float* points, const 
 static inline long xrandom(random_t* seed)
 {
 	*seed = 214013u * *seed + 2531011u;
-	return (*seed >> 16) & RANDOM_MAX;
+	return (long int)((*seed >> 16) & RANDOM_MAX);
 }
 
 static inline random_t random_range(random_t* seed, random_t range)
 {
-	return (size_t)xrandom(seed) / (RANDOM_MAX / range + 1);
+	return (random_t)((size_t)xrandom(seed) / (RANDOM_MAX / range + 1));
 }
 
 static inline void swap_vertex(vertex_t* a, vertex_t* b)

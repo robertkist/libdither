@@ -34,7 +34,12 @@ OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#include <malloc.h>
+#else
 #include <alloca.h>
+#endif
+
 #include "kdtree.h"
 
 #if defined(WIN32) || defined(__WIN32__)

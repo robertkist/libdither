@@ -1,5 +1,5 @@
 # default MingW path for Qt 6.3.x:
-WIN_MINGW_BIN_PATH=C:\\Qt\\Tools\\mingw1120_64\\bin
+WIN_MINGW_BIN_PATH=C:\\Qt\\Tools\\mingw1310_64\\bin
 
 LIB_VERSION=2025.07.07a
 
@@ -19,7 +19,7 @@ OBJ=$(patsubst %.c, $(OBJDIR)/%.o, $(SRC))
 OBJFILES=$(patsubst %.c, %.o, $(SRC))
 
 CFLAGS=-std=c11 -Wall -Wextra -Wconversion -Wshadow -Wstrict-overflow -Wformat=2 -Wundef -fno-common -O3 -Os \
-		        -Wpedantic -pedantic -Werror -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable -D"LIB_VERSION=\"$(LIB_VERSION)\""
+		        -Wpedantic -pedantic -Werror -Wno-int-to-pointer-cast -D"LIB_VERSION=\"$(LIB_VERSION)\""
 
 ifdef OS  # Windows:
 define fn_mkdir
