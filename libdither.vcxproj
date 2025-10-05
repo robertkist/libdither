@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\libdither\color_bytecolor.h" />
+    <ClInclude Include="src\libdither\color_bytepalette.h" />
+    <ClInclude Include="src\libdither\color_cachedpalette.h" />
+    <ClInclude Include="src\libdither\color_colorimage.h" />
+    <ClInclude Include="src\libdither\color_floatcolor.h" />
+    <ClInclude Include="src\libdither\color_floatpalette.h" />
+    <ClInclude Include="src\libdither\color_models.h" />
+    <ClInclude Include="src\libdither\color_quant_kdtree.h" />
+    <ClInclude Include="src\libdither\color_quant_mediancut.h" />
+    <ClInclude Include="src\libdither\color_quant_wu.h" />
+    <ClInclude Include="src\libdither\ditherimage.h" />
+    <ClInclude Include="src\libdither\dither_dotdiff_data.h" />
+    <ClInclude Include="src\libdither\dither_dotlippens_data.h" />
+    <ClInclude Include="src\libdither\dither_errordiff_data.h" />
+    <ClInclude Include="src\libdither\dither_kallebach_data.h" />
+    <ClInclude Include="src\libdither\dither_ordered_data.h" />
+    <ClInclude Include="src\libdither\dither_pattern_data.h" />
+    <ClInclude Include="src\libdither\dither_riemersma_data.h" />
+    <ClInclude Include="src\libdither\dither_varerrdiff_data.h" />
+    <ClInclude Include="src\libdither\kdtree\kdtree.h" />
+    <ClInclude Include="src\libdither\libdither.h" />
+    <ClInclude Include="src\libdither\matrices.h" />
+    <ClInclude Include="src\libdither\queue.h" />
+    <ClInclude Include="src\libdither\random.h" />
+    <ClInclude Include="src\libdither\tetrapal\tetrapal.h" />
+    <ClInclude Include="src\libdither\uthash\uthash.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\libdither\color_bytecolor.c" />
+    <ClCompile Include="src\libdither\color_bytepalette.c" />
+    <ClCompile Include="src\libdither\color_cachedpalette.c" />
+    <ClCompile Include="src\libdither\color_colorimage.c" />
+    <ClCompile Include="src\libdither\color_floatcolor.c" />
+    <ClCompile Include="src\libdither\color_floatpalette.c" />
+    <ClCompile Include="src\libdither\color_models.c" />
+    <ClCompile Include="src\libdither\color_quant_kdtree.c" />
+    <ClCompile Include="src\libdither\color_quant_mediancut.c" />
+    <ClCompile Include="src\libdither\color_quant_wu.c" />
+    <ClCompile Include="src\libdither\ditherimage.c" />
+    <ClCompile Include="src\libdither\dither_dbs.c" />
+    <ClCompile Include="src\libdither\dither_dotdiff.c" />
+    <ClCompile Include="src\libdither\dither_dotlippens.c" />
+    <ClCompile Include="src\libdither\dither_errordiff.c" />
+    <ClCompile Include="src\libdither\dither_grid.c" />
+    <ClCompile Include="src\libdither\dither_kallebach.c" />
+    <ClCompile Include="src\libdither\dither_ordered.c" />
+    <ClCompile Include="src\libdither\dither_pattern.c" />
+    <ClCompile Include="src\libdither\dither_riemersma.c" />
+    <ClCompile Include="src\libdither\dither_threshold.c" />
+    <ClCompile Include="src\libdither\dither_varerrdiff.c" />
+    <ClCompile Include="src\libdither\gamma.c" />
+    <ClCompile Include="src\libdither\kdtree\kdtree.c" />
+    <ClCompile Include="src\libdither\libdither.c" />
+    <ClCompile Include="src\libdither\queue.c" />
+    <ClCompile Include="src\libdither\random.c" />
+    <ClCompile Include="src\libdither\tetrapal\tetrapal.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{c6aba7d0-81ce-4467-bfbd-6a7b9ad5f404}</ProjectGuid>
+    <RootNamespace>libdither</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.\dist\$(Configuration)\</OutDir>
+    <IntDir>.\build\libdither\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>.\dist\$(Configuration)\</OutDir>
+    <IntDir>.\build\libdither\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;LIBDITHER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;LIBDITHER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;LIBDITHER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;LIBDITHER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

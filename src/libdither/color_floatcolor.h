@@ -33,9 +33,7 @@ void FloatColor_add(FloatColor* out, const FloatColor* in);
 void FloatColor_sub(FloatColor* out, const FloatColor* in);
 void FloatColor_add_float(FloatColor* out, double value);
 void FloatColor_sub_float(FloatColor* out, double value);
-
 void FloatColor_from_ByteColor(FloatColor* out, const ByteColor* bc);
-void FloatColor_from_FloatColor(FloatColor* out, const FloatColor* fc2);
 void FloatColor_clamp(FloatColor* ic);
 
 #endif  // COLOR_FLOATCOLOR_H

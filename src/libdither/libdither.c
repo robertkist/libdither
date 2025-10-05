@@ -1,3 +1,4 @@
+#define MODULE_API_EXPORTS
 #include <stdlib.h>
 #include "libdither.h"
 

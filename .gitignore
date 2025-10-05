@@ -3,6 +3,8 @@ dist/
 .idea/
 .DS_Store
 .vscode
+.vs/
+*.vcxproj.*
 
 # Prerequisites
 *.d

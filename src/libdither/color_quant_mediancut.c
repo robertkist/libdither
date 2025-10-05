@@ -1,3 +1,4 @@
+#define MODULE_API_EXPORTS
 #include <string.h>
 #include <math.h>
 #include "libdither.h"

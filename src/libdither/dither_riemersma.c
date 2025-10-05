@@ -13,12 +13,21 @@ MODULE_API RiemersmaCurve* RiemersmaCurve_new(int base, int add_adjust, int exp_
      * Use the create_curve function to actually generate the curve. */
     RiemersmaCurve* self = calloc(1, sizeof(RiemersmaCurve));
     self->axiom = (char*)calloc(strlen(axiom) + 1, sizeof(char));
+
+#if defined (_WIN32) && ! defined (__MINGW32__)
+    strcpy_s(self->axiom, strlen(axiom) + 1, axiom);
+#else
     strcpy(self->axiom, axiom);
+#endif
     self->rules = (char**)calloc((size_t)rule_count, sizeof(char*));
     self->keys = (char*)calloc((size_t)rule_count, sizeof(char));
     for(int i = 0; i < rule_count; i++) {
         self->rules[i] = (char*)calloc(strlen(rules[i]) + 1, sizeof(char));
-        strcpy(self->rules[i], rules[i]);
+#if defined (_WIN32) && ! defined (__MINGW32__)
+    strcpy_s(self->rules[i], strlen(rules[i]) + 1, rules[i]);
+#else
+    strcpy(self->rules[i], rules[i]);
+#endif
         self->keys[i] = keys[i];
     }
     self->base = base;
@@ -102,7 +111,11 @@ MODULE_API char* create_curve(RiemersmaCurve* curve, int width, int height, int*
     }
     // generate the curve
     char* axiom = (char*)calloc(strlen(curve->axiom) + 1, sizeof(char));
+#if defined (_WIN32) && ! defined (__MINGW32__)
+    strcpy_s(axiom, strlen(curve->axiom) + 1, curve->axiom);
+#else
     strcpy(axiom, curve->axiom);
+#endif
     for(int i = 0; i < iterations; i++) {
         size_t bufsize = (size_t)ceil((double)(strlen(axiom) + 1) * max_rule_size + 1) * max_rule_strlen + 1;
         char* out = (char*)calloc(bufsize, sizeof(char));
@@ -160,8 +173,8 @@ void riemersma_dither(const DitherImage* img, RiemersmaCurve* rcurve, bool use_r
     char* curve = create_curve(rcurve, img->width, img->height, &curve_dim);
     char* c = curve;
     // position - some curves must be centered in relation to the image
-    float xc = (rcurve->adjust == 1 || rcurve->adjust == 2)? 0.5 : 0;
-    float yc = (rcurve->adjust == 1 || rcurve->adjust == 3)? 0.5 : 0;
+    float xc = (rcurve->adjust == 1 || rcurve->adjust == 2)? 0.5f : 0;
+    float yc = (rcurve->adjust == 1 || rcurve->adjust == 3)? 0.5f : 0;
     int x = (int)((float)curve_dim * xc);
     int y = (int)((float)curve_dim * yc);
     // orientation

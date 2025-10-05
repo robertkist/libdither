@@ -1,3 +1,4 @@
+#define MODULE_API_EXPORTS
 #include <stdlib.h>
 #include <string.h>
 #include "color_bytepalette.h"
@@ -11,7 +12,7 @@ MODULE_API BytePalette* BytePalette_new(size_t size) {
     return self;
 }
 
-BytePalette* BytePalette_copy(const BytePalette* in) {
+MODULE_API BytePalette* BytePalette_copy(const BytePalette* in) {
     /* makes a deep copy of a BytePalette */
     BytePalette* out = BytePalette_new(in->size);
     memcpy(out->buffer, in->buffer, (size_t)(in->size) * BYTE_COLOR_RGB_CHANNELS * sizeof(uint8_t));

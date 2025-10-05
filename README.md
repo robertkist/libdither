@@ -467,17 +467,30 @@ Once compiled, you can find the finished library in the ```dist``` directory.
 *MacOS notes*:
 
 * Installing the XCode command line tools is all you need for building libdither
-* You can choose if you want to build a x64, arm64 or universal library. The demo, however, only builds against the current machine's architecture.
+* You can choose if you want to build a x64, arm64 or universal library. The demo, however, only builds against the 
+  current machine's architecture.
 
 *Linux notes*:
 
-* ```gcc``` and ```make``` is all you need to build libdither. E.g. on Ubuntu you should install build-essential via ```apt``` to get these tools.
+* ```gcc``` and ```make``` is all you need to build libdither. E.g. on Ubuntu you should install ```build-essential``` 
+  via ```apt``` to get these tools.
 
-*Windows notes*:
+*Windows notes - MinGW*:
 
-* You can build both MingW and MSVC targets from the Makefile (sorry, no .sln)
-* For MingW, open the Makefile and ensure the path (on top of the file) points to your MingW installation directory
-* Install make via Chocolatey package manager from chocolatey.org (https://chocolatey.org/, https://chocolatey.org/packages/make)
+* Install ```make``` via Chocolatey package manager from chocolatey.org (https://chocolatey.org/, https://chocolatey.org/packages/make)
+* Open the Makefile and ensure the path (on top of the file) points to your MingW installation directory.
+* Run ```make libdither``` to build using MinGW.
+
+*Windows notes - Microsoft Visual Studio Solution*:
+
+* Open the solution file (```.sln``) in Visual Studio 2022 or newer.
+* There are 3 projects you can build: libdither (dynamic ```.dll`` library) and the demo.
+
+*Windows notes - Microsoft Visual Studio (make)*:
+
+* To build using make, install ```make``` via Chocolatey package manager from chocolatey.org (https://chocolatey.org/, https://chocolatey.org/packages/make)
+* Run ```make libdither_msvc``` to build (make sure to run Visual Studio's ```vcvars64.bat``` first!) 
+* OR use the solution file (`.sln`) to build libdither from the Visual Studio IDE (2022 or newer).
 
 Usage
 -----

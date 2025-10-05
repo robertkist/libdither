@@ -1,7 +1,7 @@
 # default MingW path for Qt 6.3.x:
 WIN_MINGW_BIN_PATH=C:\\Qt\\Tools\\mingw1310_64\\bin
 
-LIB_VERSION=2025.07.07a
+LIB_VERSION=2025.10.04a
 
 LIBNAME=libdither
 SRCDIR=src/$(LIBNAME)
@@ -23,13 +23,15 @@ CFLAGS=-std=c11 -Wall -Wextra -Wconversion -Wshadow -Wstrict-overflow -Wformat=2
 
 ifdef OS  # Windows:
 define fn_mkdir
-	if not exist "$(1)" mkdir "$(1)"
+	@if not exist "$(1)" mkdir "$(1)"
 endef
+	SHELL=cmd
 	CP=copy
 	DELTREE=rd /s /q
 	CC=SET PATH=$(WIN_MINGW_BIN_PATH);%PATH% && gcc
 	LIBEXT=dll
 	SEP=\\
+	DEMOCMD=cd dist && demo
 else  # Unix based platforms
 define fn_mkdir
 	@mkdir -p "$(1)"
@@ -37,6 +39,7 @@ endef
 	CP=cp
 	DELTREE=rm -Rf
 	SEP=/
+	DEMOCMD=cd dist && ./demo
 	ifeq ($(shell uname), Darwin)  # macOS
 		CC=clang
 		LIBEXT=dylib
@@ -59,7 +62,7 @@ all:
 	@echo "* libdither_x64 - build macOS x86 library"
 	@echo "* libdither_arm64 - build macOS apple silicon library"
 	@echo "* libdither_universal - build universal macOS library"
-	@echo "* libdither_msvc - build using MSVC on Windows"
+	@echo "* libdither_msvc - build using MSVC on Windows (run vcvar64.bat first!)"
 	@echo "* demo - builds a small executable for the current platform to demo libdither's capabilities"
 	@echo "* clean"
 
@@ -80,7 +83,7 @@ $(LIBNAME)_arm64: $(LIBNAME)_build
 $(LIBNAME): $(LIBNAME)_build
 
 $(LIBNAME)_build: $(OBJDIR)/$(LIBNAME).$(LIBEXT)
-	$(call fn_mkdir,$(DISTDIR))
+	-$(call fn_mkdir,$(DISTDIR))
 	$(CP) $(OBJDIR)$(SEP)$(LIBNAME).$(LIBEXT) $(DISTDIR)$(SEP)$(LIBNAME).$(LIBEXT)
 	@echo "$(LIBNAME) build successfully $(TARGETARCH)"
 
@@ -88,29 +91,36 @@ $(OBJDIR)/$(LIBNAME).$(LIBEXT): $(OBJ)
 	cd $(OBJDIR) && $(CC) $(TARGETARCH) -shared $(OBJFILES) -fPIC -o $(LIBNAME).$(LIBEXT)
 
 $(OBJDIR)/%.o: $(addprefix $(SRCDIR)/, %.c)
-	$(call fn_mkdir,$(OBJDIR))
-	$(call fn_mkdir,$(OBJDIR)/tetrapal)
-	$(call fn_mkdir,$(OBJDIR)/kdtree)
+	-$(call fn_mkdir,$(OBJDIR))
+	-$(call fn_mkdir,$(OBJDIR)/tetrapal)
+	-$(call fn_mkdir,$(OBJDIR)/kdtree)
 	$(CC) $(CFLAGS) $(TARGETARCH) -c -fPIC -c $< -o $@
 
+.PHONY: libdither_msvc
 libdither_msvc:
-	@echo Make sure to run vcvars64.bat or this target will fail...
-	$(call fn_mkdir,$(OBJDIR))
-	cd build && cl.exe ..\\src\\libdither\\*.c /LD /DLL /Fe: libdither.dll
-	cd build && cl.exe ..\\src\\demo\\demo.c ..\src\demo\spng.c libdither.lib /I..\\src\\libdither /L. /Fe: demo.exe
-	$(call fn_mkdir,$(DISTDIR))
-	copy src\\demo\\*.bmp $(DISTDIR)
-	copy build\\demo.exe $(DISTDIR)
-	copy build\\libdither.dll $(DISTDIR)
+	@echo Make sure to run vcvars64.bat (for Visual Studio 2022) or this target will fail...
+	msbuild libdither.vcxproj /p:Configuration=Release
+# building without msbuild:
+#	cd build && cl.exe ..\\src\\libdither\\*.c ..\\src\\libdither\\tetrapal\\*.c ..\\src\\libdither\\kdtree\\*.c /LD /DLL /Fe: libdither.dll
+#	cd build && cl.exe ..\\src\\demo\\demo.c ..\src\demo\lodepng.c libdither.lib /I..\\src\\libdither /Fe: demo.exe
 
-demo: libdither
+.PHONY: demo_msvc
+demo_msvc:
+	msbuild demo.vcxproj /p:Configuration=Release
+
+.PHONY: demo
+demo:
 	cd dist && $(CC) $(UNIXFLAGS) -I../src/libdither -L. ../src/demo/demo.c ../src/demo/lodepng.c -ldither -lm -o demo
 	$(CP) src$(SEP)demo$(SEP)*.png $(DISTDIR)
 	$(CP) src$(SEP)demo$(SEP)blue_noise.bmp $(DISTDIR)
 
-demo_run: demo
-	@cd dist && ./demo
-	#open -a Preview	dist/david_OUT.png
+.PHONY: demo_run
+demo_run:
+	$(DEMOCMD)
+
+.PHONY: demo_run_msvc
+demo_run_msvc:
+	cd dist\Release && demo
 
 .PHONY: clean
 clean:

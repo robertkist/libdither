@@ -1,4 +1,6 @@
+#define MODULE_API_EXPORTS
 #include "color_floatcolor.h"
+#include "libdither.h"
 
 inline static double clamp(double v) {
     /* clamps a value between 0.0 and 1.0 */
@@ -47,7 +49,7 @@ void FloatColor_from_ByteColor(FloatColor* out, const ByteColor* bc) {
     out->b = (double)bc->b / 255.0;
 }
 
-void FloatColor_from_FloatColor(FloatColor* out, const FloatColor* fc2) {
+MODULE_API void FloatColor_from_FloatColor(FloatColor* out, const FloatColor* fc2) {
     /* copies a FloatColor's values */
     // TODO function should be renamed to FloatColor_copy for consistency's sake
     out->r = fc2->r;

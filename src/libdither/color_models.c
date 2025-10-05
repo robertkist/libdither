@@ -1,3 +1,4 @@
+#define MODULE_API_EXPORTS
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "color_models.h"
