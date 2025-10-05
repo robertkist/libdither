@@ -1,0 +1,185 @@
+name: Build libdither
+
+env:
+  QT_VERSION_WIN: "6.9.2"
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*-*-*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.project }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            project: win64_msvc
+          - os: windows-latest
+            project: win64_mingw
+          - os: ubuntu-22.04
+            project: linux_x86_64
+          - os: macos-latest
+            project: macos_universal
+            qt_arch: clang_64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Set up msbuild (Windows MSVC)
+        if: matrix.project == 'win64_msvc'
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
+
+      - name: Build libdither (Windows MSVC)
+        if: matrix.project == 'win64_msvc'
+        run: |
+          msbuild libdither.vcxproj /p:Configuration=Release /property:Platform=x64
+        shell: cmd
+
+      - name: Build demo (Windows MSVC)
+        if: matrix.project == 'win64_msvc'
+        run: |
+          msbuild libdither_static.vcxproj /p:Configuration=Release /property:Platform=x64
+          msbuild demo.vcxproj /p:Configuration=Release /property:Platform=x64
+        shell: cmd             
+
+      - name: Run demo (Windows MSVC)
+        if: matrix.project == 'win64_msvc'
+        run: |
+          make demo_run_msvc
+        shell: cmd     
+
+      - name: Set up Make and Chocolatey (Windows MinGW)
+        if: matrix.project == 'win64_mingw'
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: 'install make'          
+
+      - name: Set up Qt (Windows MinGW)
+        if: matrix.project == 'win64_mingw'
+        uses: jurplel/install-qt-action@v4
+        with:
+          target: 'desktop'
+          arch: ${{ matrix.qt_arch }}
+          version: ${{ env.QT_VERSION_WIN }}
+          archives: 'qtbase MinGW'
+          setup-python: true
+          cache: true
+          add-tools-to-path: true
+          set-env: true          
+      
+      - name: Build libdither (Windows MinGW)
+        if: matrix.project == 'win64_mingw'
+        run: |
+          make WIN_MINGW_BIN_PATH=%GITHUB_WORKSPACE%\Qt\${{ env.QT_VERSION_WIN }}\mingw_64\bin libdither
+        shell: cmd
+
+      - name: Build demo (Windows MinGW)
+        if: matrix.project == 'win64_mingw'
+        run: |
+          make WIN_MINGW_BIN_PATH=%GITHUB_WORKSPACE%\Qt\${{ env.QT_VERSION_WIN }}\mingw_64\bin demo
+        shell: cmd
+
+      - name: Run demo (Windows MinGW)
+        if: matrix.project == 'win64_mingw'
+        run: |
+          make demo_run
+        shell: cmd        
+
+      - name: Install prerequisites (Linux)
+        if: matrix.project == 'linux_x86_64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Build libdither (Linux)
+        if: matrix.project == 'linux_x86_64'
+        run: |
+          make libdither
+        shell: bash -l {0}     
+
+      - name: Build demo (Linux)
+        if: matrix.project == 'linux_x86_64'
+        run: |
+          make demo
+        shell: bash -l {0}            
+
+      - name: Run demo (Linux)
+        if: matrix.project == 'linux_x86_64'
+        run: |
+          make demo_run
+        shell: bash -l {0}   
+
+      - name: Build libdither (macOS)
+        if: matrix.project == 'macos_universal'
+        run: |
+          make libdither_universal
+        shell: bash   
+
+      - name: Build demo (macOS)
+        if: matrix.project == 'macos_universal'
+        run: |
+          make demo
+        shell: bash
+
+      - name: Run demo (macOS)
+        if: matrix.project == 'macos_universal'
+        run: |
+          make demo_run
+        shell: bash
+
+      - name: Cleanup (Windows MSVC)
+        if: matrix.project == 'win64_msvc'
+        run: |
+          ls -la $GITHUB_WORKSPACE/dist/Release
+          rm dist/Release/*.bmp
+          rm dist/Release/*.png
+          rm dist/Release/demo.*
+        shell: bash
+
+      - name: Cleanup (General)
+        if: matrix.project != 'win64_msvc'
+        run: |
+          ls -la $GITHUB_WORKSPACE/dist
+          rm dist/*.bmp
+          rm dist/*.png
+          rm dist/demo*      
+        shell: bash
+
+      - name: Package artifacts
+        id: pkg
+        run: |
+          ls -la $GITHUB_WORKSPACE/dist
+          echo "dist_path=$GITHUB_WORKSPACE/dist" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ditherista-${{ matrix.project }}
+          path: ${{ steps.pkg.outputs.dist_path }}
+          if-no-files-found: warn
+          retention-days: 14        
+
+
+
+
+
+
+
+
+
+
+
