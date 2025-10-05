@@ -309,19 +309,6 @@ MODULE_API DotLippensCoefficients* get_dotlippens_coefficients1(void);
 MODULE_API DotLippensCoefficients* get_dotlippens_coefficients2(void);
 MODULE_API DotLippensCoefficients* get_dotlippens_coefficients3(void);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* ************************************************* */
 /* **** COLOR - INPUT IMAGE FOR COLOR DITHERERS **** */
 /* ************************************************* */
@@ -357,18 +344,18 @@ MODULE_API void CachedPalette_set_shift(CachedPalette* self, uint8_t r_shift, ui
 MODULE_API void CachedPalette_free_cache(CachedPalette* self);
 MODULE_API void CachedPalette_set_lab_weights(CachedPalette* self, FloatColor* weights);
 
+MODULE_API void FloatColor_from_FloatColor(FloatColor* out, const FloatColor* fc2);
+
 MODULE_API BytePalette* BytePalette_new(size_t size);
 MODULE_API void BytePalette_free(BytePalette* self);
+MODULE_API ByteColor* BytePalette_get(const BytePalette* self, size_t index);
+MODULE_API void BytePalette_set(BytePalette* self, size_t index, const ByteColor* c);
+MODULE_API BytePalette* BytePalette_copy(const BytePalette* in);
 
 MODULE_API void error_diffusion_dither_color(const ColorImage* img, const ErrorDiffusionMatrix* m, CachedPalette* lookup_pal, bool serpentine, int* out);
 MODULE_API void ordered_dither_color(const ColorImage* image, CachedPalette* lookup_pal, const OrderedDitherMatrix* matrix, int* out);
 
 MODULE_API void rgb_to_linear(const FloatColor* c, FloatColor* out);
-
-
-
-
-
 
 #ifdef __cplusplus
 }

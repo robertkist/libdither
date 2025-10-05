@@ -5,7 +5,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
-#include <sys/time.h>
 
 #include "lodepng.h"
 #include "libdither.h"
@@ -51,9 +50,9 @@ DitherImage* bmp_to_monoimage(char *filename) {
     DitherImage* image = DitherImage_new(width, height);
     size_t size = width * height;
     size_t a = 0;
-    for(int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            DitherImage_set_pixel_rgba(image, x, y, png[a], png[a + 1], png[a + 2], png[a + 3], true);
+    for(size_t y = 0; y < height; y++) {
+        for (size_t x = 0; x < width; x++) {
+            DitherImage_set_pixel_rgba(image, (int)x, (int)y, png[a], png[a + 1], png[a + 2], png[a + 3], true);
             a += PNG_WIDTH;
         }
     }
@@ -190,5 +189,6 @@ int main(int argc, char* argv[]) {
         CachedPalette_free(palette);
         ColorImage_free(image);
     }
+    printf("success\n");
     return 0;
 }

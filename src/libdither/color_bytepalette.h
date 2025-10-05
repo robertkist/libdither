@@ -13,8 +13,4 @@ struct BytePalette {
 };
 typedef struct BytePalette BytePalette;
 
-BytePalette* BytePalette_copy(const BytePalette* in);
-ByteColor* BytePalette_get(const BytePalette* self, size_t index);
-void BytePalette_set(BytePalette* self, size_t index, const ByteColor* c);
-
 #endif  // COLOR_BYTEPALETTE_H

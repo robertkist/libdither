@@ -1,7 +1,8 @@
+#define MODULE_API_EXPORTS
 #include <math.h>
 #include "libdither.h"
 
-MODULE_API double gamma_decode(double c) {
+double gamma_decode(double c) {
     /* converts a sRGB input (in the range 0.0-1.0) to linear color space */
     if(c <= 0.04045)
         return c / 12.92;

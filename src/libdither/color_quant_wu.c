@@ -1,3 +1,4 @@
+#define MODULE_API_EXPORTS
 /**********************************************************************
 	    C Implementation of Wu's Color Quantizer (v. 2)
 	    (see Graphics Gems vol. II, pp. 126-133)

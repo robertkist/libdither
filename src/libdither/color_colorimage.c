@@ -1,3 +1,4 @@
+#define MODULE_API_EXPORTS
 #include "color_colorimage.h"
 #include "libdither.h"
 

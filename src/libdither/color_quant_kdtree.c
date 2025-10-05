@@ -1,3 +1,4 @@
+#define MODULE_API_EXPORTS
 #include <stdlib.h>
 #include <time.h>
 #include "kdtree/kdtree.h"
@@ -41,9 +42,12 @@ BytePalette* kdtree_quantization(const BytePalette* unique_pal, size_t target_co
     for (size_t i = 0; i < unique_pal->size; i++) {
         ByteColor_copy(&pixels[i], BytePalette_get(unique_pal, i));
     }
+
+
     // initialize centers randomly
-    ByteColor centers[target_colors];
-    size_t initial_indices[target_colors];
+    ByteColor* centers = (ByteColor*)calloc(target_colors, sizeof(ByteColor));
+    size_t* initial_indices = (size_t*)calloc(target_colors, sizeof(size_t));
+
     pick_k_unique(initial_indices, target_colors, unique_pal->size);
     for (size_t i = 0; i < target_colors; i++) {
         centers[i] = pixels[initial_indices[i]];
@@ -55,7 +59,7 @@ BytePalette* kdtree_quantization(const BytePalette* unique_pal, size_t target_co
         for (size_t i = 0; i < target_colors; i++) {
             double pt[3];
             color_to_point(&centers[i], pt);
-            kd_insert(center_tree, pt, (void*)(long)i);
+            kd_insert(center_tree, pt, (void*)i);
         }
         // assign each pixel to nearest center
         for (size_t i = 0; i < unique_pal->size; i++) {
@@ -71,9 +75,13 @@ BytePalette* kdtree_quantization(const BytePalette* unique_pal, size_t target_co
             }
         }
         kd_free(center_tree);
+
         // update centers by computing mean of assigned pixels
-        size_t count[target_colors];
-        size_t sum_r[target_colors], sum_g[target_colors], sum_b[target_colors];
+        size_t* count=(size_t*)calloc(target_colors, sizeof(size_t));
+        size_t* sum_r=(size_t*)calloc(target_colors, sizeof(size_t));
+        size_t* sum_g=(size_t*)calloc(target_colors, sizeof(size_t));
+        size_t* sum_b=(size_t*)calloc(target_colors, sizeof(size_t));
+
         for (size_t i = 0; i < target_colors; i++) {
             count[i] = sum_r[i] = sum_g[i] = sum_b[i] = 0;
         }
@@ -91,6 +99,7 @@ BytePalette* kdtree_quantization(const BytePalette* unique_pal, size_t target_co
                 centers[i].b = (unsigned char)(sum_b[i] / count[i]);
             }
         }
+        free(count); free(sum_r); free(sum_g); free(sum_b);
     }
 
     BytePalette* outpal = BytePalette_new(target_colors);
@@ -104,5 +113,7 @@ BytePalette* kdtree_quantization(const BytePalette* unique_pal, size_t target_co
     }
     free(pixels);
     free(assignments);
+    free(centers);
+    free(initial_indices);
     return outpal;
 }
